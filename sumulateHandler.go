@@ -11,6 +11,7 @@ type SimulateRequest struct {
 	Method   string            `json:"method"`
 	Headers  map[string]string `json:"headers"`
 	Body     string            `json:"body"`
+	DB_entry []DBEntry         `json:"defaultDB"`
 }
 
 func simulateHandler(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +36,7 @@ func simulateHandler(w http.ResponseWriter, r *http.Request) {
 
 	luaScript := "./scripts/" + strings.Split(found.LuaFunc, "(")[0] + ".lua"
 
-	result, err := runLuaFunctionWithContext(luaScript, found.LuaFunc, simReq)
+	result, err := runLuaFunctionWithContext(luaScript, found.LuaFunc, simReq, simReq.DB_entry)
 	if err != nil {
 		http.Error(w, "Lua error: "+err.Error(), http.StatusInternalServerError)
 		return

@@ -3,6 +3,7 @@ function api_books_get()
   local path = request.url
   local req_body = request.body
   local headers = request.headers
+  local db = request.db
 
   -- logs part:
   local log = {}
@@ -60,12 +61,41 @@ function api_books_get()
   if not inventoryNumber then
     response_status = 404
     response_body = [[{ "message": "Książka o takim numerze nie istnieje" }]]
-  elseif inventoryNumber == 200 then
-    response_body = [[{ "available_inventory_number": "200" }]]
+  elseif inventoryNumber == 200 or inventoryNumber == 101 then
+    response_body = [[{ "available_inventory_number": "]] .. tostring(inventoryNumber) .. [[" }]]
   else
     response_status = 400
     response_body = [[{ "message": "Brak poprawnego numeru inwentarzowego w ścieżce" }]]
   end
+
+  if inventoryNumber == 100 then
+    local result = {
+      response = {
+        status = 200,
+        body = [[{
+"next_available_date": "2025-05-31",
+"error": "Książka zarezerwowana \u2013 oczekuje na odbiór\n !!! Brak gwarancji, że książka będzie dostępna"
+}]]
+      },
+      log = log,
+      db = db
+    }
+    return result
+  end
+
+  -- jeżeli inventoryNumber
+
+  -- {"available_inventory_number":"101"}
+
+  -- test db change
+  -- for i, row in ipairs(db) do
+  --   if tonumber(row.inventoryNumber) == 100 then
+  --     table.insert(log, "$ changing status of book 100")
+  --     db[i].status = "borrowed"
+  --     db[1].inventoryNumber = "200"
+  --   end
+  -- end
+
 
   -- wynik końcowy
   local result = {
@@ -73,7 +103,8 @@ function api_books_get()
       status = response_status,
       body = response_body
     },
-    log = log
+    log = log,
+    db = db
   }
 
   return result

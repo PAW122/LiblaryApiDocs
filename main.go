@@ -22,11 +22,23 @@ type APIDoc struct {
 	Response    string     `json:"res"`
 	Errors      []APIError `json:"errors"`
 	Category    string     `json:"category"`
-	LuaFunc     string     `json:"luaFunc"`
+	LuaFunc     string     `json:"luaFunc,omitempty"`
+	DefaultDB   []DBEntry  `json:"defaultDB,omitempty"`
+}
+
+type DBEntry struct {
+	InventoryNumber int    `json:"inventoryNumber"`
+	Status          string `json:"status"`
 }
 
 func main() {
+	if err := loadDocs(); err != nil {
+		fmt.Println("Błąd:", err)
+		return
+	}
+
 	fmt.Println("server started on port 5899")
+
 	http.HandleFunc("/api/docs", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(docs)

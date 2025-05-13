@@ -29,26 +29,48 @@ fetch('/api/docs')
         const btn = document.createElement('button');
         btn.className = `endpoint-btn`;
 
-       const hasLuaFunc = !!doc.luaFunc;
+        const hasLuaFunc = !!doc.luaFunc;
+        const hasTestTable = !!doc.defaultDB
 
-      btn.innerHTML = `
-          <span class="method-badge method-${doc.method.toLowerCase()}">${doc.method}</span>
-          <span class="endpoint-text">${doc.endpoint}</span>
-          ${hasLuaFunc ? `<span class="test-badge">test</span>` : ''}
-      `;
+        btn.innerHTML = `
+              <span class="method-badge method-${doc.method.toLowerCase()}">${doc.method}</span>
+              <span class="endpoint-text">${doc.endpoint}</span>
+              ${hasLuaFunc ? `<span class="test-badge">test</span>` : ''}
+              ${hasTestTable ? `<span class="table-badge">DB</span>` : ''}
+          `;
 
         btn.onclick = () => {
           details.innerHTML = `
-          <h2>${doc.method} ${doc.endpoint}</h2>
-          <p><em>${doc.description}</em></p>
-          <div><strong>Permissions:</strong> ${doc.permissions}</div>
-          <div><strong>Request Body:</strong><pre>${doc.body}</pre></div>
-           <div><strong>Request Headers:</strong><pre>${doc.headers}</pre></div>
-          <div><strong>Response:</strong><pre>${doc.res}</pre></div>
-          <div><strong>Errors:</strong><ul>
-            ${doc.errors.map(e => `<li><code>${e.code}</code>: ${e.message} – ${e.description}</li>`).join('')}
-          </ul></div>
-        `;
+            <h2>${doc.method} ${doc.endpoint}</h2>
+            <p><em>${doc.description}</em></p>
+            <div><strong>Permissions:</strong> ${doc.permissions}</div>
+            <div><strong>Request Body:</strong><pre>${doc.body}</pre></div>
+            <div><strong>Request Headers:</strong><pre>${doc.headers}</pre></div>
+            <div><strong>Response:</strong><pre>${doc.res}</pre></div>
+            <div><strong>Errors:</strong><ul>
+              ${doc.errors.map(e => `<li><code>${e.code}</code>: ${e.message} – ${e.description}</li>`).join('')}
+            </ul></div>
+          `;
+
+          // Kontener na tabelę testową, jeśli istnieje
+          if (doc.defaultDB && doc.defaultDB.length > 0) {
+            details.innerHTML += `
+              <h3>Test Database (DefaultDB)</h3>
+              <table id="default-db-table" class="test-db-table">
+                <thead>
+                  <tr><th>Inventory Number</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                  ${doc.defaultDB.map(row => `
+                    <tr>
+                      <td>${row.inventoryNumber}</td>
+                      <td>${row.status}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `;
+          }
 
           // req sim part
           details.innerHTML += `
@@ -73,6 +95,8 @@ fetch('/api/docs')
             </div>
           `;
 
+
+
           document.getElementById('send-request').onclick = async () => {
             const method = document.getElementById('req-method').value;
             const headersRaw = document.getElementById('req-headers').value;
@@ -87,6 +111,14 @@ fetch('/api/docs')
               return;
             }
 
+            // przygotowanie defaultDB do wysłania (głębokie kopiowanie z doc)
+            const dbToSend = doc.defaultDB && Array.isArray(doc.defaultDB)
+              ? doc.defaultDB.map(entry => ({
+                inventoryNumber: entry.inventoryNumber,
+                status: entry.status
+              }))
+              : [];
+
             resBox.innerHTML = "<em>Sending request to Lua...</em>";
 
             try {
@@ -99,25 +131,48 @@ fetch('/api/docs')
                   endpoint: doc.endpoint,
                   method,
                   headers,
-                  body
+                  body,
+                  defaultDB: dbToSend
                 })
               });
 
               const json = await res.json();
-              console.log(json.response[0])
+              const logArray = Array.isArray(json.log)
+                ? json.log
+                : Object.values(json.log || {});
+
               resBox.innerHTML = `
-                <strong>Status:</strong> ${json.response[0]}<br>
-                <strong>Response:</strong><pre>${JSON.stringify(json.response[1], null, 2)}</pre>
-                <strong>Log:</strong><pre>${(json.log || []).join('\n')}</pre>
+                <strong>Status:</strong> ${json.response?.status || 'N/A'}<br>
+                <strong>Response:</strong><pre>${typeof json.response.body === 'string' ? json.response.body : JSON.stringify(json.response.body, null, 2)}</pre>
+                <strong>Log:</strong><pre>${logArray.join('\n')}</pre>
               `;
+
+              if (json.db && Array.isArray(json.db)) {
+                const tableHTML = `
+                  <h4>Updated DB:</h4>
+                  <table class="test-db-table">
+                    <thead>
+                      <tr><th>Inventory Number</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                      ${json.db.map(row => `
+                        <tr>
+                          <td>${row.inventoryNumber}</td>
+                          <td>${row.status}</td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                `;
+                resBox.innerHTML += tableHTML;
+              }
+
 
             } catch (err) {
               resBox.innerHTML = `<span style="color:red;"><strong>Error:</strong> ${err}</span>`;
             }
           };
-
         };
-
         list.appendChild(btn);
       });
 
