@@ -8,6 +8,17 @@ function api_books_get()
   local log = {}
   table.insert(log, "$ start simulation")
 
+  if method ~= "GET" then
+    table.insert(log, "$ Method Not Allowed")
+    return {
+      response = {
+        status = 405,
+        body = [[{ "error": "Method Not Allowed" }]]
+      },
+      log = log
+    }
+  end
+
   -- sprawdzenie tokena autoryzacji
   local token = headers["auth_token"]
   if token ~= "user_token" then
@@ -47,13 +58,13 @@ function api_books_get()
   local response_body = ""
   local response_status = 200
   if not inventoryNumber then
-    response_body = [[{ "message": "Książka o takim numerze nie istnieje" }]]
     response_status = 404
+    response_body = [[{ "message": "Książka o takim numerze nie istnieje" }]]
   elseif inventoryNumber == 200 then
     response_body = [[{ "available_inventory_number": "200" }]]
   else
-    response_body = [[{ "message": "Brak poprawnego numeru inwentarzowego w ścieżce" }]]
     response_status = 400
+    response_body = [[{ "message": "Brak poprawnego numeru inwentarzowego w ścieżce" }]]
   end
 
   -- wynik końcowy
