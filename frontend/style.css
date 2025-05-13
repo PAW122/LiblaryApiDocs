@@ -175,3 +175,13 @@ li {
   padding: 0.5em;
   margin-bottom: 1em;
 }
+
+.test-badge {
+  background-color: #34c759;
+  color: white;
+  font-weight: bold;
+  padding: 2px 6px;
+  margin-left: auto;
+  border-radius: 6px;
+  font-size: 0.75rem;
+}

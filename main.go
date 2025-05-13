@@ -18,6 +18,7 @@ type APIDoc struct {
 	Description string     `json:"description"`
 	Permissions string     `json:"permissions"`
 	Body        string     `json:"body"`
+	Headers     string     `json:"headers"`
 	Response    string     `json:"res"`
 	Errors      []APIError `json:"errors"`
 	Category    string     `json:"category"`

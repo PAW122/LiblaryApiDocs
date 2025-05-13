@@ -29,9 +29,12 @@ fetch('/api/docs')
         const btn = document.createElement('button');
         btn.className = `endpoint-btn`;
 
-        btn.innerHTML = `
-        <span class="method-badge method-${doc.method.toLowerCase()}">${doc.method}</span>
-        <span class="endpoint-text">${doc.endpoint}</span>
+       const hasLuaFunc = !!doc.luaFunc;
+
+      btn.innerHTML = `
+          <span class="method-badge method-${doc.method.toLowerCase()}">${doc.method}</span>
+          <span class="endpoint-text">${doc.endpoint}</span>
+          ${hasLuaFunc ? `<span class="test-badge">test</span>` : ''}
       `;
 
         btn.onclick = () => {
@@ -40,6 +43,7 @@ fetch('/api/docs')
           <p><em>${doc.description}</em></p>
           <div><strong>Permissions:</strong> ${doc.permissions}</div>
           <div><strong>Request Body:</strong><pre>${doc.body}</pre></div>
+           <div><strong>Request Headers:</strong><pre>${doc.headers}</pre></div>
           <div><strong>Response:</strong><pre>${doc.res}</pre></div>
           <div><strong>Errors:</strong><ul>
             ${doc.errors.map(e => `<li><code>${e.code}</code>: ${e.message} – ${e.description}</li>`).join('')}
@@ -59,7 +63,7 @@ fetch('/api/docs')
               </select><br><br>
 
               <label for="req-headers">Headers (JSON):</label><br>
-              <textarea id="req-headers" rows="4" style="width:100%; font-family: monospace;">{"Content-Type":"application/json"}</textarea><br><br>
+              <textarea id="req-headers" rows="4" style="width:100%; font-family: monospace;">${doc.headers}</textarea><br><br>
 
               <label for="req-body">Body:</label><br>
               <textarea id="req-body" rows="6" style="width:100%; font-family: monospace;">${doc.body}</textarea><br><br>
@@ -100,9 +104,10 @@ fetch('/api/docs')
               });
 
               const json = await res.json();
+              console.log(json.response[0])
               resBox.innerHTML = `
-                <strong>Status:</strong> ${res.status}<br>
-                <strong>Response:</strong><pre>${JSON.stringify(json.response, null, 2)}</pre>
+                <strong>Status:</strong> ${json.response[0]}<br>
+                <strong>Response:</strong><pre>${JSON.stringify(json.response[1], null, 2)}</pre>
                 <strong>Log:</strong><pre>${(json.log || []).join('\n')}</pre>
               `;
 

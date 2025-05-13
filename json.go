@@ -20,6 +20,7 @@ var docs = []APIDoc{
 		Description: "Pobierz książkę o podanym id",
 		Permissions: "user",
 		Body:        `{inventoryNumber: 200}`,
+		Headers:     `{"Content-Type":"application/json", "auth_token": "user_token"}`,
 		Response:    `200 OK | body: (dane książki)`,
 		Errors: []APIError{
 			{"401", "Brak autoryzacji", "-"},
@@ -28,7 +29,7 @@ var docs = []APIDoc{
 			{"500", "Wystąpił błąd podczas sprawdzania książki", "błąd serwera"},
 		},
 		Category: "LiblaryManagerApi",
-		LuaFunc:  "api_books_get",
+		LuaFunc:  "api_books_get", // nazwa pliku i funkcji lua w ./scripts
 	},
 	{
 		Method:      "GET",

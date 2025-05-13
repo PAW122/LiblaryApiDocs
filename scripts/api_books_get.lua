@@ -4,7 +4,35 @@ function api_books_get()
   local req_body = request.body
   local headers = request.headers
 
+  -- logs part:
+  local log = {}
+  table.insert(log, "$ start simulation")
+
+  -- sprawdzenie tokena autoryzacji
+  local token = headers["auth_token"]
+  if token ~= "user_token" then
+    table.insert(log, "$ brak autoryzacji: token = " .. tostring(token))
+    return {
+      response = {
+        status = 401,
+        body = [[{ "message": "Brak autoryzacji" }]]
+      },
+      log = log
+    }
+  end
+
   -- Parsowanie inventoryNumber
+  if not req_body or #req_body < 1 then
+    table.insert(log, "$ body is empty")
+    return {
+     response = {
+       status = 500,
+       body = [[{ "error": "some server error" }]]
+     },
+     log = log
+    }
+  end
+
   local inventoryNumber = nil
   if req_body then
     local _, _, value = string.find(req_body, "inventoryNumber%s*:%s*(%d+)")
@@ -13,25 +41,25 @@ function api_books_get()
     end
   end
 
-  -- logs part:
-  local log = {}
-  table.insert(log, "$ start simulation")
   table.insert(log, "$ received inventoryNumber = " .. (inventoryNumber or "nil"))
 
   -- tworzenie ciała odpowiedzi jako JSON string
   local response_body = ""
+  local response_status = 200
   if not inventoryNumber then
     response_body = [[{ "message": "Książka o takim numerze nie istnieje" }]]
+    response_status = 404
   elseif inventoryNumber == 200 then
     response_body = [[{ "available_inventory_number": "200" }]]
   else
     response_body = [[{ "message": "Brak poprawnego numeru inwentarzowego w ścieżce" }]]
+    response_status = 400
   end
 
   -- wynik końcowy
   local result = {
     response = {
-      status = "ok",
+      status = response_status,
       body = response_body
     },
     log = log
@@ -39,3 +67,17 @@ function api_books_get()
 
   return result
 end
+
+-- RESULT:
+
+-- result musi wyglądać zawsze w taki sposób, kolejność wartości w response jest ważne
+-- response[0] = status
+-- response[1] = body
+
+--  local result = {
+--     response = {
+--       status = "ok",
+--       body = response_body
+--     },
+--     log = log
+--   }
