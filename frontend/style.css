@@ -1,6 +1,18 @@
+:root {
+  --bg: #121212;
+  --panel: #1e1e1e;
+  --highlight: #2e2e2e;
+  --text: #e0e0e0;
+  --accent: #007BFF;
+  --hover: #333;
+  --border: #444;
+  --code-bg: #2a2a2a;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background: #f9f9f9;
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
   margin: 0;
   font-size: 18px;
 }
@@ -9,9 +21,10 @@ h1 {
   text-align: center;
   padding: 1em;
   font-size: 32px;
-  background-color: #007BFF;
+  background-color: var(--accent);
   color: white;
   margin: 0;
+  border-bottom: 1px solid var(--border);
 }
 
 #layout {
@@ -21,72 +34,144 @@ h1 {
 
 #sidebar {
   width: 30%;
-  background-color: #f0f0f0;
+  background-color: var(--panel);
   padding: 1em;
   overflow-y: auto;
-  border-right: 1px solid #ccc;
-}
-
-#sidebar button {
-  display: block;
-  width: 100%;
-  padding: 0.6em;
-  margin-bottom: 0.5em;
-  font-size: 16px;
-  background: white;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  text-align: left;
-}
-
-#sidebar button:hover {
-  background: #e8e8e8;
+  border-right: 1px solid var(--border);
+  transition: background 0.3s;
 }
 
 #details {
   flex: 1;
   padding: 2em;
   overflow-y: auto;
+  background: var(--bg);
 }
 
-pre {
-  background: #f5f5f5;
-  padding: 0.5em;
-  border-radius: 5px;
-  white-space: pre-wrap;
-}
-
-#details em {
-  color: #555;
-  font-size: 18px;
-  display: block;
-  margin-bottom: 1em;
+button {
+  transition: all 0.2s ease;
+  border-radius: 8px;
 }
 
 #sidebar .category-btn {
-  background: #007BFF;
+  background: var(--accent);
   color: white;
   font-weight: bold;
   padding: 0.6em;
-  margin-bottom: 0.2em;
+  margin-bottom: 0.4em;
   border: none;
   cursor: pointer;
   width: 100%;
   text-align: left;
   font-size: 18px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+#sidebar .category-btn:hover {
+  background: #005ecb;
 }
 
 #sidebar .endpoint-btn {
-  background: white;
-  color: black;
-  border: 1px solid #ccc;
-  margin: 0.2em 0;
+  background: var(--highlight);
+  color: var(--text);
+  border: 1px solid var(--border);
+  margin: 0.3em 0;
   padding: 0.5em;
   cursor: pointer;
   width: 100%;
   text-align: left;
+  font-size: 16px;
 }
 
 #sidebar .endpoint-btn:hover {
-  background: #f0f0f0;
+  background: var(--hover);
+}
+
+pre {
+  background: var(--code-bg);
+  color: #cceeff;
+  padding: 0.8em;
+  border-radius: 8px;
+  white-space: pre-wrap;
+  border: 1px solid var(--border);
+}
+
+#details em {
+  color: #aaa;
+  font-size: 18px;
+  display: block;
+  margin-bottom: 1em;
+  font-style: italic;
+}
+
+ul {
+  padding-left: 1.2em;
+}
+
+li {
+  margin-bottom: 0.3em;
+}
+
+
+.method-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  font-weight: bold;
+  font-size: 14px;
+  border-radius: 6px;
+  color: white;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Kolory metod */
+.method-get     { background-color: #4caf50; }  /* Zielony */
+.method-post    { background-color: #2196f3; }  /* Niebieski */
+.method-put     { background-color: #ff9800; }  /* Pomarańczowy */
+.method-delete  { background-color: #f44336; }  /* Czerwony */
+.method-patch   { background-color: #9c27b0; }  /* Fiolet */
+.method-ws,
+.method-websocket { background-color: #00bcd4; } /* Cyjan */
+
+.endpoint-path {
+  color: #e0e0e0;
+  font-family: monospace;
+  font-size: 16px;
+  word-break: break-all;
+}
+
+/* req sim */
+#simulator {
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1em;
+  margin-top: 2em;
+}
+
+#simulator textarea {
+  background: #222;
+  color: #eee;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 0.5em;
+}
+
+#simulator-response pre {
+  background: #222;
+  color: #b2ff59;
+  padding: 0.5em;
+  border-radius: 6px;
+  margin-top: 0.5em;
+}
+
+#simulator select,
+#simulator textarea {
+  background: #222;
+  color: #eee;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 0.5em;
+  margin-bottom: 1em;
 }
