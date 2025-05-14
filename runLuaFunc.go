@@ -3,12 +3,13 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	lua "github.com/yuin/gopher-lua"
 )
 
-func runLuaFunctionWithContext(file string, funcCall string, req SimulateRequest, defaultDB []DBEntry) (string, error) {
+func runLuaFunctionWithContext(file string, funcCall string, req SimulateRequest, defaultDB []map[string]any, parsedBody map[string]any) (string, error) {
 	L := lua.NewState()
 	defer L.Close()
 
@@ -24,12 +25,36 @@ func runLuaFunctionWithContext(file string, funcCall string, req SimulateRequest
 	}
 	L.SetField(reqTable, "headers", headersTable)
 
+	// pree parsed body
+	parsedTable := L.NewTable()
+	for k, v := range parsedBody {
+		switch val := v.(type) {
+		case string:
+			L.SetField(parsedTable, k, lua.LString(val))
+		case float64:
+			L.SetField(parsedTable, k, lua.LNumber(val))
+		default:
+			L.SetField(parsedTable, k, lua.LString(fmt.Sprintf("%v", val)))
+		}
+	}
+	L.SetField(reqTable, "json", parsedTable)
+
 	// Przekazanie defaultDB jako request.db
 	dbTable := L.NewTable()
 	for _, entry := range defaultDB {
 		row := L.NewTable()
-		L.SetField(row, "inventoryNumber", lua.LNumber(entry.InventoryNumber))
-		L.SetField(row, "status", lua.LString(entry.Status))
+		for key, val := range entry {
+			switch v := val.(type) {
+			case string:
+				L.SetField(row, key, lua.LString(v))
+			case float64:
+				L.SetField(row, key, lua.LNumber(v))
+			case int:
+				L.SetField(row, key, lua.LNumber(v))
+			default:
+				L.SetField(row, key, lua.LString(fmt.Sprintf("%v", v)))
+			}
+		}
 		dbTable.Append(row)
 	}
 	L.SetField(reqTable, "db", dbTable)

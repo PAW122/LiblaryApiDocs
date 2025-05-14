@@ -28,7 +28,7 @@
     "permissions": "user",
     "body": "{inventoryNumber: 200}",
     "headers": "{\"Content-Type\":\"application/json\", \"auth_token\": \"user_token\"}",
-    "res": "200 OK | body: (dane książki)",
+    "res": "200 OK",
     "errors": [
       {
         "code": "401",
@@ -110,8 +110,8 @@
     "endpoint": "/api/book/add",
     "description": "dodaj nową książkę do db",
     "permissions": "admin",
-    "body": "-",
-    "headers": "",
+    "body": "{\"title\": \"example_title\", \"author\": \"ex_author\", \"publisher\": \"ex_publisher\", \"year\": \"2025\", \"isbn\": \"ex_isbn\", \"pages\": \"100\", \"description\": \"ex_description\", \"tags\": \"ex_tags\", \"shelf\": \"4C\", \"copies\": \"{copies json}\"}",
+    "headers": "{\"Content-Type\":\"application/json\", \"auth_token\": \"user_token\", \"username\": \"example_username\"}",
     "res": "200 OK",
     "errors": [
       {
@@ -125,7 +125,22 @@
         "description": "błąd serwera"
       }
     ],
-    "category": "LiblaryManagerApi"
+    "category": "LiblaryManagerApi",
+    "luaFunc": "api_books_add",
+    "defaultDB": [
+      {
+        "title": "example_title",
+        "author": "author",
+        "publisher": "publisher",
+        "year": "year",
+        "isbn": "isbn",
+        "pages": "pages",
+        "description": "description",
+        "tags": "tags",
+        "shelf": "shelf",
+        "copies": "copies_data {json} ..."
+      }
+    ]
   },
   {
     "method": "POST",

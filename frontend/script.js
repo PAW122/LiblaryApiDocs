@@ -1,4 +1,4 @@
-fetch('/api/docs')
+fetch(`/api/docs?_=${Date.now()}`)
   .then(res => res.json())
   .then(docs => {
     const sidebar = document.getElementById('sidebar');
@@ -53,35 +53,41 @@ fetch('/api/docs')
           `;
 
           // Kontener na tabelę testową, jeśli istnieje
-          if (doc.defaultDB && doc.defaultDB.length > 0) {
-            details.innerHTML += `
+         if (doc.defaultDB && doc.defaultDB.length > 0) {
+            const headers = Object.keys(doc.defaultDB[0]);
+
+            const tableHTML = `
               <h3>Test Database (DefaultDB)</h3>
-              <table id="default-db-table" class="test-db-table">
+              <table class="test-db-table">
                 <thead>
-                  <tr><th>Inventory Number</th><th>Status</th></tr>
+                  <tr>
+                    ${headers.map(h => `<th>${h}</th>`).join('')}
+                  </tr>
                 </thead>
                 <tbody>
                   ${doc.defaultDB.map(row => `
                     <tr>
-                      <td>${row.inventoryNumber}</td>
-                      <td>${row.status}</td>
+                      ${headers.map(h => `<td>${row[h]}</td>`).join('')}
                     </tr>
                   `).join('')}
                 </tbody>
               </table>
             `;
+
+            details.innerHTML += tableHTML;
           }
 
+          const default_method = doc.method.toUpperCase();
           // req sim part
           details.innerHTML += `
             <h3>Request Simulator</h3>
             <div id="simulator">
               <label for="req-method">Method:</label><br>
-              <select id="req-method">
-                <option>GET</option>
-                <option>POST</option>
-                <option>PUT</option>
-                <option>DELETE</option>
+               <select id="req-method">
+                <option value="GET" ${default_method === "GET" ? "selected" : ""}>GET</option>
+                <option value="POST" ${default_method === "POST" ? "selected" : ""}>POST</option>
+                <option value="PUT" ${default_method === "PUT" ? "selected" : ""}>PUT</option>
+                <option value="DELETE" ${default_method === "DELETE" ? "selected" : ""}>DELETE</option>
               </select><br><br>
 
               <label for="req-headers">Headers (JSON):</label><br>
@@ -113,11 +119,9 @@ fetch('/api/docs')
 
             // przygotowanie defaultDB do wysłania (głębokie kopiowanie z doc)
             const dbToSend = doc.defaultDB && Array.isArray(doc.defaultDB)
-              ? doc.defaultDB.map(entry => ({
-                inventoryNumber: entry.inventoryNumber,
-                status: entry.status
-              }))
+              ? doc.defaultDB.map(entry => ({ ...entry }))
               : [];
+
 
             resBox.innerHTML = "<em>Sending request to Lua...</em>";
 
@@ -147,25 +151,42 @@ fetch('/api/docs')
                 <strong>Log:</strong><pre>${logArray.join('\n')}</pre>
               `;
 
-              if (json.db && Array.isArray(json.db)) {
+              if (json.db) {
+                // Konwersja: jeśli db jest obiektem (np. {"1": {...}, "2": {...}}), przekształć do tablicy
+                const dbArray = Array.isArray(json.db)
+                  ? json.db
+                  : Object.values(json.db);
+
+                if (dbArray.length === 0) return;
+
+                // Wyciągnij wszystkie unikalne klucze z każdego obiektu (scal kolumny)
+                const headersSet = new Set();
+                dbArray.forEach(row => {
+                  if (typeof row === 'object') {
+                    Object.keys(row).forEach(k => headersSet.add(k));
+                  }
+                });
+                const headers = Array.from(headersSet);
+
                 const tableHTML = `
                   <h4>Updated DB:</h4>
                   <table class="test-db-table">
                     <thead>
-                      <tr><th>Inventory Number</th><th>Status</th></tr>
+                      <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
                     </thead>
                     <tbody>
-                      ${json.db.map(row => `
+                      ${dbArray.map(row => `
                         <tr>
-                          <td>${row.inventoryNumber}</td>
-                          <td>${row.status}</td>
+                          ${headers.map(h => `<td>${row[h] ?? ''}</td>`).join('')}
                         </tr>
                       `).join('')}
                     </tbody>
                   </table>
                 `;
+
                 resBox.innerHTML += tableHTML;
               }
+
 
 
             } catch (err) {

@@ -7,11 +7,11 @@ import (
 )
 
 type SimulateRequest struct {
-	Endpoint string            `json:"endpoint"`
-	Method   string            `json:"method"`
-	Headers  map[string]string `json:"headers"`
-	Body     string            `json:"body"`
-	DB_entry []DBEntry         `json:"defaultDB"`
+	Endpoint string                   `json:"endpoint"`
+	Method   string                   `json:"method"`
+	Headers  map[string]string        `json:"headers"`
+	Body     string                   `json:"body"`
+	DB_entry []map[string]interface{} `json:"defaultDB"`
 }
 
 func simulateHandler(w http.ResponseWriter, r *http.Request) {
@@ -20,6 +20,9 @@ func simulateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
+
+	var parsedBody map[string]interface{}
+	json.Unmarshal([]byte(simReq.Body), &parsedBody)
 
 	var found *APIDoc
 	for _, doc := range docs {
@@ -36,7 +39,7 @@ func simulateHandler(w http.ResponseWriter, r *http.Request) {
 
 	luaScript := "./scripts/" + strings.Split(found.LuaFunc, "(")[0] + ".lua"
 
-	result, err := runLuaFunctionWithContext(luaScript, found.LuaFunc, simReq, simReq.DB_entry)
+	result, err := runLuaFunctionWithContext(luaScript, found.LuaFunc, simReq, simReq.DB_entry, parsedBody)
 	if err != nil {
 		http.Error(w, "Lua error: "+err.Error(), http.StatusInternalServerError)
 		return

@@ -13,22 +13,17 @@ type APIError struct {
 }
 
 type APIDoc struct {
-	Method      string     `json:"method"`
-	Endpoint    string     `json:"endpoint"`
-	Description string     `json:"description"`
-	Permissions string     `json:"permissions"`
-	Body        string     `json:"body"`
-	Headers     string     `json:"headers"`
-	Response    string     `json:"res"`
-	Errors      []APIError `json:"errors"`
-	Category    string     `json:"category"`
-	LuaFunc     string     `json:"luaFunc,omitempty"`
-	DefaultDB   []DBEntry  `json:"defaultDB,omitempty"`
-}
-
-type DBEntry struct {
-	InventoryNumber int    `json:"inventoryNumber"`
-	Status          string `json:"status"`
+	Method      string                   `json:"method"`
+	Endpoint    string                   `json:"endpoint"`
+	Description string                   `json:"description"`
+	Permissions string                   `json:"permissions"`
+	Body        string                   `json:"body"`
+	Headers     string                   `json:"headers"`
+	Response    string                   `json:"res"`
+	Errors      []APIError               `json:"errors"`
+	Category    string                   `json:"category"`
+	LuaFunc     string                   `json:"luaFunc,omitempty"`
+	DefaultDB   []map[string]interface{} `json:"defaultDB,omitempty"`
 }
 
 func main() {
