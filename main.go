@@ -13,6 +13,7 @@ type APIError struct {
 }
 
 type APIDoc struct {
+	Markdown    []string                 `json:"markdown"`
 	Method      string                   `json:"method"`
 	Endpoint    string                   `json:"endpoint"`
 	Description string                   `json:"description"`
@@ -40,6 +41,8 @@ func main() {
 	})
 
 	http.HandleFunc("/api/simulate", simulateHandler)
+	http.HandleFunc("/api/markdowns", listMarkdownsHandler)
+	http.HandleFunc("/api/markdowns/view", viewMarkdownHandler)
 
 	http.Handle("/", http.FileServer(http.Dir("./frontend")))
 	http.ListenAndServe(":5899", nil)

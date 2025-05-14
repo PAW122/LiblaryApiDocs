@@ -106,6 +106,7 @@
     "category": "LiblaryManagerApi"
   },
   {
+    "markdown": ["api/api_books_add.md"],
     "method": "POST",
     "endpoint": "/api/book/add",
     "description": "dodaj nową książkę do db",

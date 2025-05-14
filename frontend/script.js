@@ -31,13 +31,49 @@ fetch(`/api/docs?_=${Date.now()}`)
 
         const hasLuaFunc = !!doc.luaFunc;
         const hasTestTable = !!doc.defaultDB
+        const hadMarkdown = !!doc.markdown
 
         btn.innerHTML = `
               <span class="method-badge method-${doc.method.toLowerCase()}">${doc.method}</span>
               <span class="endpoint-text">${doc.endpoint}</span>
               ${hasLuaFunc ? `<span class="test-badge">test</span>` : ''}
               ${hasTestTable ? `<span class="table-badge">DB</span>` : ''}
+              ${hadMarkdown ? `<span class="markdown-badge">MD</span>` : ''}
           `;
+
+        // markdowns
+        const container = document.createElement('div');
+        container.className = "endpoint-container";
+
+        // dodaj główny przycisk
+        container.appendChild(btn);
+
+        // dodaj markdown-y dopiero POD endpointem
+        if (doc.markdown && Array.isArray(doc.markdown)) {
+          const markdownWrapper = document.createElement('div');
+          markdownWrapper.className = "markdown-wrapper"; // do stylowania jako małe
+
+          doc.markdown.forEach(path => {
+            const mdBtn = document.createElement('button');
+            mdBtn.textContent = path.split('/').pop(); // np. api_books_add.md
+            mdBtn.className = 'markdown-btn';
+
+            mdBtn.onclick = async () => {
+              const res = await fetch(`/api/markdowns/view?path=${encodeURIComponent(path)}`);
+              const mdText = await res.text();
+              const html = marked.parse(mdText);
+              details.innerHTML = `<h2>${path}</h2>${html}`;
+            };
+
+            markdownWrapper.appendChild(mdBtn);
+          });
+
+          container.appendChild(markdownWrapper); // ← dodane pod spodem
+        }
+
+        // list.appendChild(container);
+
+
 
         btn.onclick = () => {
           details.innerHTML = `
@@ -194,12 +230,66 @@ fetch(`/api/docs?_=${Date.now()}`)
             }
           };
         };
-        list.appendChild(btn);
+        list.appendChild(container);
       });
 
 
       section.appendChild(header);
       section.appendChild(list);
       sidebar.appendChild(section);
+    });
+  });
+
+
+
+fetch(`/api/markdowns?_=${Date.now()}`)
+  .then(res => res.json())
+  .then(mdFiles => {
+    const groupedMd = {};
+    mdFiles.forEach(file => {
+      if (!groupedMd[file.category]) groupedMd[file.category] = [];
+      groupedMd[file.category].push(file);
+    });
+
+    Object.entries(groupedMd).forEach(([category, files]) => {
+      const section = document.createElement('div');
+      const header = document.createElement('button');
+      header.textContent = `[MD] ${category.toUpperCase()}`;
+      header.className = 'category-btn';
+
+      const list = document.createElement('div');
+      list.style.display = 'none';
+
+      header.onclick = () => {
+        list.style.display = list.style.display === 'none' ? 'block' : 'none';
+      };
+
+      files.forEach(file => {
+        const btn = document.createElement('button');
+        btn.className = `endpoint-btn method-md`;
+        btn.innerHTML = `
+          <span class="method-badge method-md">.md</span>
+          <span class="endpoint-text">${file.name}</span>
+        `;
+
+        btn.onclick = async () => {
+          console.log(encodeURIComponent(file.path))
+          const res = await fetch(`/api/markdowns/view?path=${encodeURIComponent(file.path)}`);
+          const mdText = await res.text();
+
+          // Jeśli chcesz renderować jako czysty <pre>:
+          // details.innerHTML = `<h2>${file.name}</h2><pre>${mdText}</pre>`;
+
+          // Jeśli chcesz renderować jako HTML (Markdown → HTML):
+          const html = marked.parse(mdText); // potrzebujesz biblioteki "marked"
+          details.innerHTML = `<h2>${file.name}</h2>${html}`;
+        };
+
+        list.appendChild(btn);
+      });
+
+      section.appendChild(header);
+      section.appendChild(list);
+      document.getElementById('sidebar').appendChild(section);
     });
   });
