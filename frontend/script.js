@@ -252,6 +252,9 @@ fetch(`/api/markdowns?_=${Date.now()}`)
     });
 
     Object.entries(groupedMd).forEach(([category, files]) => {
+      files = files.filter(file => !file.name.startsWith('_'));
+      if (files.length === 0) return;
+
       const section = document.createElement('div');
       const header = document.createElement('button');
       header.textContent = `[MD] ${category.toUpperCase()}`;
