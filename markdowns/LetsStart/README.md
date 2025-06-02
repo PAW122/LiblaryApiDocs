@@ -30,20 +30,21 @@
 
 ### 📌 Dostępne pola w `docs.json`:
 
-| Pole         | Typ        | Opis                                                                 |
-|--------------|------------|----------------------------------------------------------------------|
-| `markdown`   | `[]string` | (opcjonalne) Ścieżki do plików `.md` przypisanych do tego endpointu |
-| `method`     | `string`   | Metoda HTTP (np. GET, POST)                                         |
-| `endpoint`   | `string`   | Endpoint API                                                        |
-| `description`| `string`   | Opis działania endpointu                                            |
-| `permissions`| `string`   | Wymagane uprawnienia (np. `admin`)                                  |
-| `body`       | `string`   | Przykładowe ciało zapytania                                         |
-| `headers`    | `string`   | Wymagane nagłówki HTTP                                              |
-| `res`        | `string`   | Przykładowa odpowiedź                                               |
-| `errors`     | `[]object` | Lista możliwych błędów                                              |
-| `category`   | `string`   | Kategoria, pod którą będzie pogrupowany endpoint                    |
-| `luaFunc`    | `string`   | (opcjonalne) Nazwa funkcji Lua do symulacji                         |
-| `defaultDB`  | `[]object` | (opcjonalne) Domyślna struktura pokazowa bazy danych (tabelka)      |
+| Pole          | Typ               | Opis                                                                 |
+|---------------|-------------------|----------------------------------------------------------------------|
+| `markdown`    | `[]string`        | (opcjonalne) Ścieżki do plików `.md` przypisanych do tego endpointu  |
+| `method`      | `string`          | Metoda HTTP (np. GET, POST)                                          |
+| `endpoint`    | `string`          | Endpoint API                                                         |
+| `description` | `string`          | Opis działania endpointu                                             |
+| `permissions` | `string`          | Wymagane uprawnienia (np. `admin`)                                   |
+| `body`        | `string`          | Przykładowe ciało zapytania                                          |
+| `headers`     | `string`          | Wymagane nagłówki HTTP                                               |
+| `query_params`| `[]QueryParam`    | Wymagane nagłówki Query                                              |
+| `res`         | `string`          | Przykładowa odpowiedź                                                |
+| `errors`      | `[]object`        | Lista możliwych błędów                                               |
+| `category`    | `string`          | Kategoria, pod którą będzie pogrupowany endpoint                     |
+| `luaFunc`     | `string`          | (opcjonalne) Nazwa funkcji Lua do symulacji                          |
+| `defaultDB`   | `[]object`        | (opcjonalne) Domyślna struktura pokazowa bazy danych (tabelka)       |
 
 ---
 
