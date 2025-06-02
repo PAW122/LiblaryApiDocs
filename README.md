@@ -1,5 +1,8 @@
 # LiblaryApiDocs
 
+# Run
+./docs-linux <port>
+
 # todo
 1. przenieść z json.go do faktyczne jsona
 2. dodać symulacje db - coś w stylu: tabelki

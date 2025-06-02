@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 )
 
 type APIError struct {
@@ -28,12 +29,17 @@ type APIDoc struct {
 }
 
 func main() {
+	port := "5899"
+	if len(os.Args) > 1 {
+		port = os.Args[1]
+	}
+
 	if err := loadDocs(); err != nil {
 		fmt.Println("Błąd:", err)
 		return
 	}
 
-	fmt.Println("server started on port 5899")
+	fmt.Println("server started on port", port)
 
 	http.HandleFunc("/api/docs", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -45,5 +51,5 @@ func main() {
 	http.HandleFunc("/api/markdowns/view", viewMarkdownHandler)
 
 	http.Handle("/", http.FileServer(http.Dir("./frontend")))
-	http.ListenAndServe(":5899", nil)
+	http.ListenAndServe(":"+port, nil)
 }
