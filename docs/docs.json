@@ -28,6 +28,7 @@
     "permissions": "user",
     "body": "{inventoryNumber: 200}",
     "headers": "{\"Content-Type\":\"application/json\", \"auth_token\": \"user_token\"}",
+    "query_params": [{"name": "test", "value": "value"}],
     "res": "200 OK",
     "errors": [
       {

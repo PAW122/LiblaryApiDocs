@@ -21,11 +21,17 @@ type APIDoc struct {
 	Permissions string                   `json:"permissions"`
 	Body        string                   `json:"body"`
 	Headers     string                   `json:"headers"`
+	QueryParams []QueryParam             `json:"query_params"`
 	Response    string                   `json:"res"`
 	Errors      []APIError               `json:"errors"`
 	Category    string                   `json:"category"`
 	LuaFunc     string                   `json:"luaFunc,omitempty"`
 	DefaultDB   []map[string]interface{} `json:"defaultDB,omitempty"`
+}
+
+type QueryParam struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
 }
 
 func main() {

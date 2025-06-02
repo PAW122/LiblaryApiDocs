@@ -82,14 +82,39 @@ fetch(`/api/docs?_=${Date.now()}`)
             <div><strong>Permissions:</strong> ${doc.permissions}</div>
             <div><strong>Request Body:</strong><pre>${doc.body}</pre></div>
             <div><strong>Request Headers:</strong><pre>${doc.headers}</pre></div>
-            <div><strong>Response:</strong><pre>${doc.res}</pre></div>
-            <div><strong>Errors:</strong><ul>
-              ${doc.errors.map(e => `<li><code>${e.code}</code>: ${e.message} – ${e.description}</li>`).join('')}
-            </ul></div>
           `;
 
+          if (doc.query_params && doc.query_params.length > 0) {
+            const queryTable = `
+              <h3>Query Parameters:</h3>
+              <table class="query-params-table">
+                <thead>
+                  <tr><th>Name</th><th>Value</th></tr>
+                </thead>
+                <tbody>
+                  ${doc.query_params.map(q => `
+                    <tr>
+                      <td>${q.name}</td>
+                      <td>${q.value}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+              <br>
+            `;
+            details.innerHTML += queryTable;
+          }
+
+          const rest = `
+           <div><strong>Response:</strong><pre>${doc.res}</pre></div>
+            <div><strong>Errors:</strong><ul>
+              ${doc.errors.map(e => `<li><code>${e.code}</code>: ${e.message} – ${e.description}</li>`).join('')}
+            </ul></div>`
+
+          details.innerHTML += rest
+
           // Kontener na tabelę testową, jeśli istnieje
-         if (doc.defaultDB && doc.defaultDB.length > 0) {
+          if (doc.defaultDB && doc.defaultDB.length > 0) {
             const headers = Object.keys(doc.defaultDB[0]);
 
             const tableHTML = `
